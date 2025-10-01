@@ -111,17 +111,14 @@ boolean FRAM_MB85RS_SPI::begin()
     SPI.begin();
     
     boolean result = _getDeviceID();
+    _framInitialised = false;
   
 	if (result && _manufacturer == FUJITSU_ID && _maxaddress != 0)
     {
 		_framInitialised = true;
-        return true;
 	}
     
-    _framInitialised = false;
-    return false;
-}
-    
+
 #if defined(DEBUG_TRACE) || defined(CHIP_TRACE)
     if (!Serial)
         Serial.begin(115200);
@@ -134,7 +131,7 @@ boolean FRAM_MB85RS_SPI::begin()
     else
         Serial.println("inactive");
     
-    if (deviceFound)
+    if (_framInitialised)
     {
         Serial.println("Memory Chip initialized");
         _deviceID2Serial();
@@ -142,9 +139,15 @@ boolean FRAM_MB85RS_SPI::begin()
     else
         Serial.println("ERROR : Memory Chip NOT FOUND\n");
 #endif
+
+    return _framInitialised;
 }
 
-
+void FRAM_MB85RS_SPI::end()
+{
+    SPI.end();
+    _framInitialised = false;
+}
 
 /*!
 ///     @brief   read()
@@ -204,6 +207,7 @@ boolean FRAM_MB85RS_SPI::read(uint32_t framAddr, uint16_t *value)
     *value = ((uint16_t)buffer[1] << 8) | (uint16_t)buffer[0];
 
     _lastaddress = framAddr + 2;
+
 
     return true;
 }
