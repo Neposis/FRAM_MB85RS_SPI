@@ -92,8 +92,7 @@ class FRAM_MB85RS_SPI
     FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp);
     
 
-    void	init();
-    boolean	checkDevice();
+    boolean	begin();
     
     boolean	read(uint32_t framAddr, uint8_t *value);
     boolean	read(uint32_t framAddr, uint16_t *value);
