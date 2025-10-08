@@ -612,12 +612,12 @@ boolean FRAM_MB85RS_SPI::disableWP()
 ///    @return  0: error
 ///             1: ok
 **/
-boolean FRAM_MB85RS_SPI::eraseChip()
+boolean FRAM_MB85RS_SPI::eraseChip(uint32_t startaddress)
 {
     if ( !_framInitialised )
         return false;
     
-    uint32_t i = 0;
+    uint32_t i = startaddress;
     boolean result = true;
     
     #ifdef DEBUG_TRACE
@@ -633,7 +633,7 @@ boolean FRAM_MB85RS_SPI::eraseChip()
             Serial.print("ERROR: Device erasing stopped at position ");
             Serial.println(i-1, DEC);
         } else
-            Serial.print("Erased from address 0x00 to 0x"); Serial.println(i-1, HEX);
+            Serial.print("Erased from address 0x"); Serial.println(startaddress, HEX); Serial.print(" to 0x"); Serial.println(i-1, HEX);
             Serial.println("Device erased!");
     #endif
     

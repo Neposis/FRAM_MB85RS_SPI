@@ -111,7 +111,7 @@ class FRAM_MB85RS_SPI
     boolean	getWPStatus();
     boolean	enableWP();
     boolean	disableWP();
-    boolean	eraseChip();
+    boolean	eraseChip(uint32_t startaddress = 0);
     uint32_t getMaxMemAdr();
     uint32_t getLastMemAdr();
     
