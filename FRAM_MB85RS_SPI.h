@@ -107,6 +107,7 @@ class FRAM_MB85RS_SPI
     boolean writeArray(uint32_t startAddr, const uint8_t values[], size_t nbItems);
     boolean writeArray(uint32_t startAddr, const uint16_t values[], size_t nbItems);
     
+    boolean getDeviceInfo(uint8_t *manufacturer, uint16_t *productID);
     boolean	isAvailable();
     boolean	getWPStatus();
     boolean	enableWP();

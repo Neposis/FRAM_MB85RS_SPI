@@ -535,6 +535,25 @@ boolean FRAM_MB85RS_SPI::writeArray( uint32_t startAddr, const uint16_t values[]
     return true;
 }
 
+/*!
+///    @brief   getDeviceInfo()
+///             Returns the Manufacturer ID and the Product ID
+///    @param   manufacturer pointer to store the Manufacturer ID
+///    @param   productID pointer to store the Product ID
+///    @return  0: error
+///             1: ok
+**/
+boolean FRAM_MB85RS_SPI::getDeviceInfo(uint8_t *manufacturer, uint16_t *productID)
+{
+    if (_framInitialised) {
+        *manufacturer = _manufacturer;
+        *productID = _productID;
+        return true;
+    }
+
+    return false;
+}
+
 
 
 /*!

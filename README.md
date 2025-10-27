@@ -1,3 +1,14 @@
+# Fork of Christopherpersoz/FRAM_MB85RS_SPI #
+
+This FRAM library has some great features compared to the Adafruit one like array based reading, chip wiping and selectable reading bitsize.
+
+Updated for slightly more secure logic and fixed up some issues. Unfortunately the library hasn't been worked on since 2021, but still functions well.
+
+
+
+-----------
+# <font color="red">Original README:</font> #
+
 Arduino library for SPI FRAM - Fujitsu MB85RS
 ==============
 
