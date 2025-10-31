@@ -82,8 +82,8 @@
 class FRAM_MB85RS_SPI
 {
  public:
-    FRAM_MB85RS_SPI(uint8_t cs);
-    FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp);
+    FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug = false);
+    FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp, bool enableDebug = false);
     
 
     boolean	begin();

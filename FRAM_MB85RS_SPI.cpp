@@ -54,7 +54,7 @@
 ///              Constructor without write protection management
 ///     @param   cs chip select pin - active low
 **/
-FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug = false)
+FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug)
 {
     if (Serial.available()) {
         _enableDebug = enableDebug;
@@ -81,7 +81,7 @@ FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug = false)
 ///     @param   cs chip select pin - active low
 ///     @param   wp write protected pin - active low
 **/
-FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp, bool enableDebug = false)
+FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp, bool enableDebug)
 {
     if (Serial.available()) {
         _enableDebug = enableDebug;
