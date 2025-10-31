@@ -54,8 +54,14 @@
 ///              Constructor without write protection management
 ///     @param   cs chip select pin - active low
 **/
-FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs)
+FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug = false)
 {
+    if (Serial.available()) {
+        _enableDebug = enableDebug;
+    } else {
+        _enableDebug = false;
+    }
+
     _cs = cs;
     _wp = false; // No WP pin connected, WP management inactive
     
@@ -75,8 +81,13 @@ FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs)
 ///     @param   cs chip select pin - active low
 ///     @param   wp write protected pin - active low
 **/
-FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp)
+FRAM_MB85RS_SPI::FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp, bool enableDebug = false)
 {
+    if (Serial.available()) {
+        _enableDebug = enableDebug;
+    } else {
+        _enableDebug = false;
+    }
     _cs = cs;
 
     _wp = true; // WP pin connected and Write Protection enabled
@@ -119,26 +130,29 @@ boolean FRAM_MB85RS_SPI::begin()
 	}
     
 
-#if defined(DEBUG_TRACE) || defined(CHIP_TRACE)
-    if (!Serial)
-        Serial.begin(115200);
-    while (!Serial) {}
-    
-    Serial.println("FRAM_MB85RS_SPI created\n");
-    Serial.print("Write protect management: ");
-    if (_wp)
-        Serial.println("active");
-    else
-        Serial.println("inactive");
-    
-    if (_framInitialised)
-    {
-        Serial.println("Memory Chip initialized");
-        _deviceID2Serial();
+    if (_enableDebug) {
+        // Why oh why would you add BLOCKING CODE IN YOUR LIBRARY FOR ARDUINO WHYYYYY
+        //  - A frustrated author after having a day of issues
+
+        // if (!Serial)
+        //     Serial.begin(115200);
+        // while (!Serial) {}
+        
+        Serial.println("FRAM_MB85RS_SPI created\n");
+        Serial.print("Write protect management: ");
+        if (_wp)
+            Serial.println("active");
+        else
+            Serial.println("inactive");
+        
+        if (_framInitialised)
+        {
+            Serial.println("Memory Chip initialized");
+            _deviceID2Serial();
+        }
+        else
+            Serial.println("ERROR : Memory Chip NOT FOUND\n");
     }
-    else
-        Serial.println("ERROR : Memory Chip NOT FOUND\n");
-#endif
 
     return _framInitialised;
 }
@@ -162,10 +176,10 @@ boolean FRAM_MB85RS_SPI::read( uint32_t framAddr, uint8_t *value )
     if (framAddr >= _maxaddress || !_framInitialised)
         return false;
     
-//#ifdef DEBUG_TRACE
-//    Serial.print("Read address : ");
-//    Serial.println(framAddr, BIN);
-//#endif
+    if (_enableDebug) {
+       Serial.print("Read address : ");
+       Serial.println(framAddr, BIN);
+    }
     
     _csASSERT();
         // Read byte operation
@@ -384,10 +398,10 @@ boolean FRAM_MB85RS_SPI::readArray( uint32_t startAddr, uint8_t values[], size_t
     for (uint32_t i = 0; i < nbItems; i++)
     {
         values[i] = SPI.transfer(0);
-#ifdef DEBUG_TRACE
-        Serial.print("Adr 0x"); Serial.print(startAddr+i, HEX);
-        Serial.print(", Value[");Serial.print(i); Serial.print("] = 0x"); Serial.println(values[i], HEX);
-#endif
+        if (_enableDebug) {
+            Serial.print("Adr 0x"); Serial.print(startAddr+i, HEX);
+            Serial.print(", Value[");Serial.print(i); Serial.print("] = 0x"); Serial.println(values[i], HEX);
+        }
     }
     
     _csRELEASE();
@@ -431,10 +445,10 @@ boolean FRAM_MB85RS_SPI::readArray( uint32_t startAddr, uint16_t values[], size_
             buffer[1] = SPI.transfer(0);
             values[i] = ((uint16_t) buffer[1] << 8) + (uint16_t)buffer[0];
             
-#ifdef DEBUG_TRACE
-            Serial.print("Adr 0x"); Serial.print(startAddr+(i*2), HEX);
-            Serial.print(", Value[");Serial.print(i); Serial.print("] = 0x"); Serial.println(values[i], HEX);
-#endif
+            if (_enableDebug) {
+                Serial.print("Adr 0x"); Serial.print(startAddr+(i*2), HEX);
+                Serial.print(", Value[");Serial.print(i); Serial.print("] = 0x"); Serial.println(values[i], HEX);
+            }
         }
     _csRELEASE();
     
@@ -646,7 +660,7 @@ boolean FRAM_MB85RS_SPI::eraseChip(uint32_t startaddress)
     while( i < _maxaddress && result )
         result = write(i++, (uint8_t)0);
     
-    #ifdef DEBUG_TRACE
+    if (_enableDebug) {
         if ( !result )
         {
             Serial.print("ERROR: Device erasing stopped at position ");
@@ -654,7 +668,7 @@ boolean FRAM_MB85RS_SPI::eraseChip(uint32_t startaddress)
         } else
             Serial.print("Erased from address 0x"); Serial.println(startaddress, HEX); Serial.print(" to 0x"); Serial.println(i-1, HEX);
             Serial.println("Device erased!");
-    #endif
+    }
     
     _lastaddress = _maxaddress;
     
@@ -681,10 +695,10 @@ uint32_t FRAM_MB85RS_SPI::getMaxMemAdr()
  **/
 uint32_t FRAM_MB85RS_SPI::getLastMemAdr()
 {
-#ifdef DEBUG_TRACE
-    Serial.print("Last address used in memory: 0x");
-    Serial.println(_lastaddress, HEX);
-#endif
+    if (_enableDebug) {
+        Serial.print("Last address used in memory: 0x");
+        Serial.println(_lastaddress, HEX);
+    }
     return _lastaddress;
 }
 
@@ -809,18 +823,17 @@ boolean FRAM_MB85RS_SPI::_deviceID2Serial()
     if (!Serial)
         return false; // Serial not available
     
-	#ifdef CHIP_TRACE
-        Serial.println("\n** F-RAM Device IDs");
-        Serial.print("Manufacturer 0x"); Serial.println(_manufacturer, HEX);
-        Serial.print("ProductID 0x"); Serial.println(_productID, HEX);
-        Serial.print("Density code 0x"); Serial.print(_densitycode, HEX);
-        Serial.print(", Chip density "); Serial.print(_density, DEC); Serial.println("KBits");
-        Serial.print("Max address : 0 to "); Serial.print(_maxaddress-1, DEC); Serial.print(" / "); Serial.println(_maxaddress-1, HEX);
-        Serial.println("Device identfied automatically");
-    #else
-        return false;
-    #endif
-
+        if (_enableDebug) {
+            Serial.println("\n** F-RAM Device IDs");
+            Serial.print("Manufacturer 0x"); Serial.println(_manufacturer, HEX);
+            Serial.print("ProductID 0x"); Serial.println(_productID, HEX);
+            Serial.print("Density code 0x"); Serial.print(_densitycode, HEX);
+            Serial.print(", Chip density "); Serial.print(_density, DEC); Serial.println("KBits");
+            Serial.print("Max address : 0 to "); Serial.print(_maxaddress-1, DEC); Serial.print(" / "); Serial.println(_maxaddress-1, HEX);
+            Serial.println("Device identfied automatically");
+        } else {
+         return false;
+        }
     
 	return true;
 }

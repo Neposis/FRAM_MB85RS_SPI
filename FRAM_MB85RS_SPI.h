@@ -49,12 +49,6 @@
 // DEFINES
 
 #define SPICONFIG   SPISettings(28000000, MSBFIRST, SPI_MODE0) // SPI frequency (24 MHz max), MODE 0
-#ifndef DEBUG_TRACE
-    #define DEBUG_TRACE    // Enabling Debug Trace on Serial
-#endif
-#ifndef CHIP_TRACE
-    #define CHIP_TRACE     // Serial trace for characteristics of the chip
-#endif
 
 
 // IDs - can be extends to any other compatible chip
@@ -120,6 +114,7 @@ class FRAM_MB85RS_SPI
  private:
     
     boolean		_framInitialised;
+    bool        _enableDebug;   // Enable debug messages
     uint8_t     _cs;            // CS pin
     boolean     _wp;            // WP management
     uint8_t     _wpPin;         // WP pin connected and Write Protection enabled
