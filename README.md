@@ -8,10 +8,12 @@ Updated for slightly more secure logic and fixed up some issues. Unfortunately t
 ## Structure:
 
 ### Init:
+```
 FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug = false);
 FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp, bool enableDebug = false);
-
+```
 ### Main Functions:
+```
 boolean	begin();
 void end();
 
@@ -26,8 +28,9 @@ boolean readArray(uint32_t startAddr, uint8_t values[], size_t nbItems);
 boolean readArray(uint32_t startAddr, uint16_t values[], size_t nbItems);
 boolean writeArray(uint32_t startAddr, const uint8_t values[], size_t nbItems);
 boolean writeArray(uint32_t startAddr, const uint16_t values[], size_t nbItems);
-
+```
 ### Helper functions:
+```
 boolean getDeviceInfo(uint8_t *manufacturer, uint16_t *productID);
 boolean	isAvailable();
 boolean	getWPStatus();
@@ -36,7 +39,7 @@ boolean	disableWP();
 boolean	eraseChip(uint32_t startaddress = 0);
 uint32_t getMaxMemAdr();
 uint32_t getLastMemAdr();
-
+```
 
 -----------
 # <font color="red">Original README:</font> #
