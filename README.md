@@ -5,6 +5,38 @@ This FRAM library has some great features compared to the Adafruit one like arra
 Updated for slightly more secure logic and fixed up some issues. Unfortunately the library hasn't been worked on since 2021, but still functions well.
 
 
+## Structure:
+
+### Init:
+FRAM_MB85RS_SPI(uint8_t cs, bool enableDebug = false);
+FRAM_MB85RS_SPI(uint8_t cs, uint8_t wp, bool enableDebug = false);
+
+### Main Functions:
+boolean	begin();
+void end();
+
+boolean	read(uint32_t framAddr, uint8_t *value);
+boolean	read(uint32_t framAddr, uint16_t *value);
+boolean	read(uint32_t framAddr, uint32_t *value);
+boolean	write(uint32_t framAddr, uint8_t value);
+boolean	write(uint32_t framAddr, uint16_t value);
+boolean	write(uint32_t framAddr, uint32_t value);
+
+boolean readArray(uint32_t startAddr, uint8_t values[], size_t nbItems);
+boolean readArray(uint32_t startAddr, uint16_t values[], size_t nbItems);
+boolean writeArray(uint32_t startAddr, const uint8_t values[], size_t nbItems);
+boolean writeArray(uint32_t startAddr, const uint16_t values[], size_t nbItems);
+
+### Helper functions:
+boolean getDeviceInfo(uint8_t *manufacturer, uint16_t *productID);
+boolean	isAvailable();
+boolean	getWPStatus();
+boolean	enableWP();
+boolean	disableWP();
+boolean	eraseChip(uint32_t startaddress = 0);
+uint32_t getMaxMemAdr();
+uint32_t getLastMemAdr();
+
 
 -----------
 # <font color="red">Original README:</font> #
