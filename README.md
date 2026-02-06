@@ -41,6 +41,81 @@ uint32_t getMaxMemAdr();
 uint32_t getLastMemAdr();
 ```
 
+## Changelog:
+- Safer address handling logic
+- Removed blocking code which would prevent operation unless connected to Serial
+- Better erase function, allowing both partial and full erase
+- Better device info function
+- begin() and end() functions
+
+## Usage:
+## Simple usage example:
+```cpp
+// ==== Init with debug ====
+#define FRAM_CS 5;
+
+FRAM_MB85RS_SPI FRAM(FRAM_CS, true);
+
+#define BLOCK_SIZE = 256; 		// If you are structuring data in blocks
+
+// ...
+
+if (FRAM.begin()) {
+	TERM.println("Failed to start FRAM chip");
+	return;
+}
+
+bool ok;
+
+// ==== Getting chip info ====
+uint8_t manufacturer; 
+uint16_t productID; 
+uint16_t density; 
+uint32_t maxaddress;
+ok = getDeviceInfo(&manufacturer, &productID, &density, &maxaddress);
+
+
+// ==== Writing block of memory (eg String) ====
+const String dataString = "ABCDEF";
+Serial.print("Saving: ");
+Serial.println(dataString);
+size_t slen = dataString.length();
+uint8_t buffer[BLOCK_SIZE];
+
+memset(buffer, 0, BLOCK_SIZE);                	// <-- zero buffer to avoid leftover garbage
+uint8_t len8 = (uint8_t)slen;					// Data length
+
+// First byte is length, followed by string data
+buffer[0] = len8;								
+memcpy(buffer + 1, dataString.c_str(), len8); 	
+
+// Write array of bytes to FRAM
+ok = FRAM.writeArray(0x0, buffer, BLOCK_SIZE);
+
+
+// ==== Reading block of memory ====
+uint8_t buffer[BLOCK_SIZE];
+if (!FRAM.readArray(0x0, buffer, BLOCK_SIZE)) {
+	Serial.println("FRAM read failed for record " + String(i));
+	continue;
+}
+
+uint8_t len = buffer[0];
+
+// payload starts at buffer[1]
+String record = String((const char *)(buffer + 1), len);
+record.trim();
+Serial.print("Read from memory: ");
+Serial.println(record);
+
+
+// ==== Clearing FRAM ====
+ok = FRAM.eraseChip();
+
+// ==== Finishing up ====
+FRAM.end();
+```
+
 -----------
 # <font color="red">Original README:</font> #
 
